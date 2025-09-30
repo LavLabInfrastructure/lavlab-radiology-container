@@ -1,0 +1,53 @@
+name: Build and publish Docker image to GHCR
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: publish-ghcr-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ghcr.io/lavlabinfrastructure/lavlab-radiology-container:${{ github.event.release.tag_name }}
+            ghcr.io/lavlabinfrastructure/lavlab-radiology-container:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ github.event.release.published_at }}
+
+      - name: Publish release note (output)
+        run: |
+          echo "Published image tags:"
+          echo "  ghcr.io/lavlabinfrastructure/lavlab-radiology-container:${{ github.event.release.tag_name }}"
+          echo "  ghcr.io/lavlabinfrastructure/lavlab-radiology-container:latest"

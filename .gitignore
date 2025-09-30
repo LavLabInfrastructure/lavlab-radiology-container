@@ -1,0 +1,4 @@
+*.deb
+*.py
+license.txt
+*logs

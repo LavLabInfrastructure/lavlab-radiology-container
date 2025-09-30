@@ -1,0 +1,38 @@
+
+#!/bin/sh
+# recon-all-clinical wrapper
+# Ensures the real `recon-all-clinical.sh` is executed under tcsh. If the
+# current shell is already tcsh (or csh) we exec the script directly, otherwise
+# we re-exec it using `tcsh` if available.
+
+set -eu
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TARGET="$SCRIPT_DIR/recon-all-clinical.sh"
+
+if [ ! -f "$TARGET" ]; then
+	TARGET="$(command -v recon-all-clinical.sh 2>/dev/null || true)"
+fi
+
+if [ -z "$TARGET" ] || [ ! -f "$TARGET" ]; then
+	echo "Error: recon-all-clinical.sh not found in script dir or PATH." >&2
+	echo "Place the Freesurfer 'recon-all-clinical.sh' next to this wrapper or ensure it's on PATH." >&2
+	exit 2
+fi
+
+# Get the current shell name (basename of the process for $$)
+shell_name="$(ps -p $$ -o comm= 2>/dev/null | awk -F/ '{print $NF}' | tr -d '[:space:]')"
+
+case "$shell_name" in
+	tcsh|csh)
+		exec "$TARGET" "$@" ;;
+	*)
+		if command -v tcsh >/dev/null 2>&1; then
+			# exec tcsh with the script and forward args
+			exec tcsh "$TARGET" "$@"
+		else
+			echo "Error: tcsh not found. Install tcsh (e.g. apt-get install -y tcsh) or run this under tcsh." >&2
+			exit 3
+		fi ;;
+esac
+

@@ -1,0 +1,11 @@
+wget            
+file            
+dc              
+mesa-utils      
+pulseaudio      
+libquadmath0    
+libgtk2.0-0     
+firefox         
+libgomp1
+tcl
+tk
