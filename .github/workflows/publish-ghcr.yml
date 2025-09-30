@@ -3,14 +3,13 @@ name: Build and publish Docker image to GHCR
 on:
   release:
     types: [published]
-
 permissions:
   contents: read
   packages: write
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: [olympus-dind]
     concurrency:
       group: publish-ghcr-${{ github.ref }}
       cancel-in-progress: true
