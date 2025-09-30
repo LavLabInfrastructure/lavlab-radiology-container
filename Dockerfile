@@ -190,36 +190,31 @@ COPY --from=freesurfer-builder --chown=coder:coder /opt/freesurfer_payload/usr/l
 COPY --from=fsl-builder --chown=coder:coder /opt/fsl /opt/fsl
 
 # use Zsh for my mac folks
-RUN apt-get update && apt-get install -y zsh && \
-    chsh -s $(which zsh) coder && \
-    sh -c "$(curl -L https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)"
-
-# Minimal cleanup to reduce final image size: remove apt/pip caches, docs, examples, tests, locales, and pycache
-RUN set -eux; \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /var/cache/man/* || true; \
-    rm -rf /usr/share/doc /usr/share/doc/* /usr/share/man /usr/share/man/* /usr/share/info /usr/share/info/* || true; \
-    rm -rf /usr/share/locale /usr/share/locale/* /usr/share/locale-langpack || true; \
-    # Remove common large directories under /opt (docs, examples, tests, demo, share, man)
-    find /opt -type d \( -iname doc -o -iname docs -o -iname example* -o -iname demo* -o -iname test* -o -iname tests -o -iname share -o -iname man \) -prune -exec rm -rf {} + || true; \
-    # Remove common Python cache files
-    find / -type d -name __pycache__ -prune -exec rm -rf {} + || true; \
-    find / -name '*.pyc' -delete || true; \
-    # Remove any .git metadata that might have been copied
-    find /opt -name '.git' -prune -exec rm -rf {} + || true; \
-    # Clean /tmp
-    rm -rf /tmp/* || true
+RUN sh -c "$(curl -L https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)"
 
 ENV FREESURFER_VERSION=${FREESURFER_VERSION}
 ENV FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}
 ENV FSLDIR=/opt/fsl
 ENV PATH="/opt/afni:${PATH}"
 
-RUN echo 'source ${FREESURFER_HOME}/SetUpFreeSurfer.sh' >> /etc/bash.bashrc
-RUN echo 'source ${FREESURFER_HOME}/SetUpFreeSurfer.sh' >> /etc/zsh/zshrc
-RUN echo 'source ${FREESURFER_HOME}/SetUpFreeSurfer.csh' >> /etc/csh.cshrc
+RUN echo 'export PATH=/opt/afni:$PATH' >> /etc/bash.bashrc
+RUN echo 'export PATH=/opt/afni:$PATH' >> /etc/zsh/zshrc
+RUN echo 'export PATH=/opt/afni:$PATH' >> /etc/csh.cshrc
+RUN echo 'export FSLDIR=/opt/fsl' >> /etc/bash.bashrc
+RUN echo 'export FSLDIR=/opt/fsl' >> /etc/zsh/zshrc
+RUN echo 'export FSLDIR=/opt/fsl' >> /etc/csh.cshrc
 RUN echo 'source ${FSLDIR}/etc/fslconf/fsl.sh' >> /etc/bash.bashrc
 RUN echo 'source ${FSLDIR}/etc/fslconf/fsl.sh' >> /etc/zsh/zshrc
 RUN echo 'source ${FSLDIR}/etc/fslconf/fsl.csh' >> /etc/csh.cshrc
+RUN echo 'export FREESURFER_VERSION=${FREESURFER_VERSION}' >> /etc/bash.bashrc
+RUN echo 'export FREESURFER_VERSION=${FREESURFER_VERSION}' >> /etc/zsh/zshrc
+RUN echo 'export FREESURFER_VERSION=${FREESURFER_VERSION}' >> /etc/csh.cshrc
+RUN echo 'export FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}' >> /etc/bash.bashrc
+RUN echo 'export FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}' >> /etc/zsh/zshrc
+RUN echo 'export FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}' >> /etc/csh.cshrc
+RUN echo 'source ${FREESURFER_HOME}/SetUpFreeSurfer.sh' >> /etc/bash.bashrc
+RUN echo 'source ${FREESURFER_HOME}/SetUpFreeSurfer.sh' >> /etc/zsh/zshrc
+RUN echo 'source ${FREESURFER_HOME}/SetUpFreeSurfer.csh' >> /etc/csh.cshrc
 
 USER coder
 ENV HOME=/home/coder
