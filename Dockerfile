@@ -195,7 +195,7 @@ RUN sh -c "$(curl -L https://github.com/deluan/zsh-in-docker/releases/download/v
 ENV FREESURFER_VERSION=${FREESURFER_VERSION}
 ENV FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}
 ENV FSLDIR=/opt/fsl
-ENV PATH="/opt/afni:${PATH}"
+ENV PATH='/opt/afni:${PATH}'
 
 RUN echo 'export PATH=/opt/afni:$PATH' >> /etc/bash.bashrc
 RUN echo 'export PATH=/opt/afni:$PATH' >> /etc/zsh/zshrc
@@ -206,9 +206,9 @@ RUN echo 'setenv FSLDIR=/opt/fsl' >> /etc/csh.cshrc
 RUN echo 'source ${FSLDIR}/etc/fslconf/fsl.sh' >> /etc/bash.bashrc
 RUN echo 'source ${FSLDIR}/etc/fslconf/fsl.sh' >> /etc/zsh/zshrc
 RUN echo 'source ${FSLDIR}/etc/fslconf/fsl.csh' >> /etc/csh.cshrc
-RUN echo 'export FREESURFER_VERSION=${FREESURFER_VERSION}' >> /etc/bash.bashrc
-RUN echo 'export FREESURFER_VERSION=${FREESURFER_VERSION}' >> /etc/zsh/zshrc
-RUN echo 'setenv FREESURFER_VERSION=${FREESURFER_VERSION}' >> /etc/csh.cshrc
+RUN echo "export FREESURFER_VERSION=${FREESURFER_VERSION}" >> /etc/bash.bashrc
+RUN echo "export FREESURFER_VERSION=${FREESURFER_VERSION}" >> /etc/zsh/zshrc
+RUN echo "setenv FREESURFER_VERSION=${FREESURFER_VERSION}" >> /etc/csh.cshrc
 RUN echo 'export FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}' >> /etc/bash.bashrc
 RUN echo 'export FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}' >> /etc/zsh/zshrc
 RUN echo 'setenv FREESURFER_HOME=/opt/freesurfer/${FREESURFER_VERSION}' >> /etc/csh.cshrc
